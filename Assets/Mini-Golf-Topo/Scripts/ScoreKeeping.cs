@@ -9,6 +9,7 @@ public class ScoreKeeping : MonoBehaviour {
 	private int hits;
 	public Text textScore;
 	public Text hitsScore;
+	public Text hitsForHole;
 	public GameObject panel;
 
 	// Use this for initialization
@@ -20,8 +21,9 @@ public class ScoreKeeping : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		textScore.text = "Score: " + score;
-		hitsScore.text = "Hits: " + hits;
+		textScore.text = score+"/30";
+		hitsScore.text = ""+hits;
+		hitsForHole.text = "3";
 		if (won == true) {
 			panel.SetActive(true);
 		} else {
