@@ -4,35 +4,35 @@ using System.Collections;
 public class BallForce : MonoBehaviour {
 
 	private Rigidbody rigidbody;
-	private bool stopX = false;
-	private bool stopZ = false;
+	private bool stop = false;
 	private bool printOnce = true;
 	private bool inHole;
 	public ControlBall cbScript;
 	private ScoreKeeping scoreKeep;
+	private Vector3 ballPos;
 
 	// Use this for initialization
 	void Start () {
 		rigidbody = GetComponent<Rigidbody> ();
 		cbScript = GetComponent<ControlBall> ();
 		scoreKeep = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
+		ballPos = transform.position;
 	}
 	void FixedUpdate()
 	{
-		if((Mathf.Abs (rigidbody.velocity.x) < 3) && (Mathf.Abs (rigidbody.velocity.z) < 3))
+		if((Mathf.Abs (rigidbody.velocity.x) < 1) && (Mathf.Abs (rigidbody.velocity.z) < 1))
 		{
-			stopX = true;
-			rigidbody.velocity = new Vector3 (0, rigidbody.velocity.y, rigidbody.velocity.z);
-			stopZ = true;
-			rigidbody.velocity = new Vector3 (rigidbody.velocity.x, rigidbody.velocity.y, 0);
+			transform.position = ballPos;
+			rigidbody.velocity = new Vector3 (0, rigidbody.velocity.y, 0);
+			stop = true;
 		}
 		else
 		{
-			stopX = false;
-			stopZ = false;
+			stop = false;
+			ballPos = transform.position;
 		}
 
-		if(stopX && stopZ)
+		if(stop)
 		{
 			if(inHole)
 			{
@@ -50,15 +50,12 @@ public class BallForce : MonoBehaviour {
 		}
 
 	}
-	public void rotateBall()
-	{
-
-	}
 
 	public void addForce(float force)
 	{
 		//print ("force: "+force);
-		rigidbody.AddForce (transform.forward * force);
+		Vector3 forward = new Vector3 (transform.forward.x, 0, transform.forward.z);
+		rigidbody.AddForce (forward * force);
 		scoreKeep.addToHits ();
 		scoreKeep.addToScore ();
 	}
@@ -74,13 +71,9 @@ public class BallForce : MonoBehaviour {
 			inHole = false;
 		}
 	}
-	public bool getStopX()
+	public bool getStop()
 	{
-		return stopX;
+		return stop;
 	}
 
-	public bool getStopZ()
-	{
-		return stopZ;
-	}
 }
