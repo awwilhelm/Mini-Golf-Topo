@@ -3,12 +3,9 @@ using System.Collections;
 
 public class ControlBall : MonoBehaviour {
 
-	private float forceBase = 2;
 	private float distance;
 	private BallForce bfScript;
 	public Texture arrow;
-	bool dirSet;
-	bool forceSet;
 	private Vector3 v3_transform;
 	public Canvas canvasArrow;
 	private float maxDistance = 20;
@@ -22,58 +19,73 @@ public class ControlBall : MonoBehaviour {
 	void Start () {
 		bfScript = GetComponent<BallForce> ();
 		scoreKeep = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
-		dirSet = false;
-		forceSet = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		//If player left-clicks add force
 		if (Input.GetMouseButtonDown (0))
-			dirSet = true;
-		if (!dirSet) {
-			v3_transform = Input.mousePosition;
-			v3_transform.z = Mathf.Abs (Camera.main.transform.position.y - transform.position.y);
-			v3_transform = Camera.main.ScreenToWorldPoint (v3_transform);
-			distance = Vector3.Distance(v3_transform, transform.position);
-			v3_transform -= transform.position;
-			v3_transform = v3_transform * 10000.0f + transform.position;
-			transform.LookAt (-v3_transform);
-			transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y, 0));
-			UpdateArrow(v3_transform);
-
-
-		}
-		else
 		{
-			if(!forceSet && !scoreKeep.getWin() && bfScript.getStop())
+
+			if(!scoreKeep.getWin() && bfScript.getStop())
 			{
-				forceSet = true;
 				if(distance>maxDistance)
 					distance = maxDistance;
 				else if(distance<minDistance)
 					distance = minDistance;
-				// print (distance);
-				//if(distance<10)
+				
 				bfScript.addForce(distance * FORCE); //7500
-				//else
-					//bfScript.addForce(500 + Mathf.Pow(forceBase, distance)/10 );//+500 /33
-
 			}
+		}
+		//If the player does not left click then this updates the dirction the ball faces and the arrow.
+		else {
+			if(!scoreKeep.getWin() && bfScript.getStop())
+			{
+				v3_transform = UpdateFacingDirection();
+
+				transform.LookAt (-v3_transform);
+				transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y, 0));
+
+				UpdateArrow(v3_transform);
+				canvasArrow.enabled = true;
+			}
+			else
+			{
+				canvasArrow.enabled = false;
+			}
+
 		}
 
 	}
-	public void addForceAgain()
+
+	//Makes a variable that converts the mouse position to a 2-D position on the screen.
+	private Vector3 UpdateFacingDirection()
 	{
-		dirSet = false;
-		forceSet = false;
+		Vector3 temp_transform;
+		temp_transform = Input.mousePosition;
+		temp_transform.z = Mathf.Abs (Camera.main.transform.position.y - transform.position.y);
+		temp_transform = Camera.main.ScreenToWorldPoint (temp_transform);
+
+		//Finds distance before makes transform negative and adding constants.
+		distance = Vector3.Distance(temp_transform, transform.position);
+
+		temp_transform -= transform.position;
+
+		//Without this the arrow moves based on the percentage of the screen the mouse is on.
+		temp_transform = temp_transform * 10000.0f + transform.position;
+		
+
+		return temp_transform;
 	}
 
+	//Sets the arrows position and rotation.  Also adjusts the scale of the arrow.
 	private void UpdateArrow(Vector3 v3T)
 	{
 		canvasArrow.transform.position = new Vector3(transform.position.x, 99, transform.position.z);
 		canvasArrow.transform.rotation = Quaternion.LookRotation(new Vector3(v3T.x, v3T.y, v3T.z));
 		canvasArrow.transform.rotation = Quaternion.Euler(new Vector3(270, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z-90));
 		//canvasArrow.transform.position = new Vector3(canvasArrow.transform.position.x, canvasArrow.transform.position.y +300, canvasArrow.transform.position.z);
+
 		if(distance<=maxDistance && distance>=minDistance)
 			canvasArrow.transform.localScale = new Vector3(arrowScaleCoefficient*distance, arrowScaleCoefficient*distance, arrowScaleCoefficient*distance);
 		else if(distance>maxDistance)
@@ -82,18 +94,13 @@ public class ControlBall : MonoBehaviour {
 			canvasArrow.transform.localScale = new Vector3(arrowScaleCoefficient*minDistance, arrowScaleCoefficient*minDistance, arrowScaleCoefficient*minDistance);
 
 		
-		if(!bfScript.getStop() || scoreKeep.getWin())
-		{
-			canvasArrow.enabled = false;
-		} else {
-			canvasArrow.enabled = true;
-		}
+
 
 	}
 
 	void OnGUI()
 	{
-		Vector3 ballPos = Camera.main.WorldToScreenPoint(transform.position);
+		//Vector3 ballPos = Camera.main.WorldToScreenPoint(transform.position);
 		if (bfScript.getStop ()) {
 			//GUI.DrawTexture (new Rect (ballPos.x - 100, Screen.height - 20 - ballPos.y, 100, 40), arrow);
 		}

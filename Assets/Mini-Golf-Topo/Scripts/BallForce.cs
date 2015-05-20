@@ -3,27 +3,31 @@ using System.Collections;
 
 public class BallForce : MonoBehaviour {
 
-	private Rigidbody rigidbody;
+	private new Rigidbody rigidbody;
 	private bool stop = false;
-	private bool printOnce = true;
 	private bool inHole;
 	public ControlBall cbScript;
 	private ScoreKeeping scoreKeep;
 	private Vector3 ballPos;
 
-	// Use this for initialization
 	void Start () {
 		rigidbody = GetComponent<Rigidbody> ();
 		cbScript = GetComponent<ControlBall> ();
 		scoreKeep = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
 		ballPos = transform.position;
 	}
+
+	//If both the x and y are within a certain number, the ball will stop.
 	void FixedUpdate()
 	{
 		if((Mathf.Abs (rigidbody.velocity.x) < 1) && (Mathf.Abs (rigidbody.velocity.z) < 1))
 		{
 			transform.position = ballPos;
 			rigidbody.velocity = new Vector3 (0, rigidbody.velocity.y, 0);
+			if(inHole)
+			{
+				scoreKeep.setWin();
+			}
 			stop = true;
 		}
 		else
@@ -32,25 +36,9 @@ public class BallForce : MonoBehaviour {
 			ballPos = transform.position;
 		}
 
-		if(stop)
-		{
-			if(inHole)
-			{
-				scoreKeep.setWin();
-				if(printOnce)
-				{
-					printOnce = false;
-					print ("You win!");
-				}
-			}
-			else
-			{
-				cbScript.addForceAgain();
-			}
-		}
-
 	}
 
+	//Add a force to the ball and adds the hit to scorekeeping.
 	public void addForce(float force)
 	{
 		//print ("force: "+force);
