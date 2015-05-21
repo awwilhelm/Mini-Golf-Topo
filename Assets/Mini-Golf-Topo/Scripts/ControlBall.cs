@@ -13,7 +13,8 @@ public class ControlBall : MonoBehaviour {
 	private float arrowScaleCoefficient = 0.048f;
 	public ScoreKeeping scoreKeep;
 
-	private const int FORCE = 9000;
+	private const int FORCE = 15000;
+	private const int DISTANCE_OFFSET = 20000;
 
 	// Use this for initialization
 	void Start () {
@@ -22,7 +23,7 @@ public class ControlBall : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		//If player left-clicks add force
 		if (Input.GetMouseButtonDown (0))
 		{
@@ -34,7 +35,7 @@ public class ControlBall : MonoBehaviour {
 				else if(distance<minDistance)
 					distance = minDistance;
 				
-				bfScript.addForce(distance * FORCE); //7500
+				bfScript.addForce((distance * FORCE) - DISTANCE_OFFSET); //7500
 			}
 		}
 		//If the player does not left click then this updates the dirction the ball faces and the arrow.
