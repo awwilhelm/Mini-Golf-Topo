@@ -7,7 +7,6 @@ public class BallForce : MonoBehaviour {
 	public ScoreKeeping scoreKeep;
 	public CameraFollow cameraFollow;
 	private Rigidbody ballRigidbody;
-	private ControlBall cbScript;
 
 	//Values related with the ball moving
 	private Vector3 ballPos;
@@ -20,12 +19,11 @@ public class BallForce : MonoBehaviour {
 	private bool isBallMovingAfterHit = false;
 
 	//Constant variables
-	private const float DELAY_BEFORE_BALL_HIT = 0.8f;
+	private const float DELAY_BEFORE_BALL_HIT = 0.25f;
 	private const float MIN_BALL_VELOCITY = 1f;
 
 	void Start () {
 		ballRigidbody = GetComponent<Rigidbody> ();
-		cbScript = GetComponent<ControlBall> ();
 
 		ballPos = transform.position;
 		hitForce = 0;
