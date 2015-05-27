@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Threading;
 
 public class ControlBall : MonoBehaviour {
 
@@ -34,8 +35,10 @@ public class ControlBall : MonoBehaviour {
 					distance = maxDistance;
 				else if(distance<minDistance)
 					distance = minDistance;
-				
-				bfScript.addForce((distance * FORCE) - DISTANCE_OFFSET); //7500
+
+				bfScript.addHitForce((distance * FORCE) - DISTANCE_OFFSET);
+
+				//bfScript.addForce((distance * FORCE) - DISTANCE_OFFSET); //7500
 			}
 		}
 		//If the player does not left click then this updates the dirction the ball faces and the arrow.
