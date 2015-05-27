@@ -4,23 +4,25 @@ using System.Threading;
 
 public class ControlBall : MonoBehaviour {
 
-	private float distance;
-	private BallForce bfScript;
+	
 	public Texture arrow;
-	private Vector3 v3_transform;
 	public Canvas canvasArrow;
-	private float maxDistance = 20;
-	private float minDistance = 3;
-	private float arrowScaleCoefficient = 0.048f;
 	public ScoreKeeping scoreKeep;
+	private BallForce bfScript;
+
+	private float distance;
+	private Vector3 v3_transform;
 
 	private const int FORCE = 15000;
 	private const int DISTANCE_OFFSET = 20000;
+	private const float MAX_DISTANCE = 20;
+	private const float MIN_DISTANCE = 3;
+	private const float ARROW_SCALE_COEFFICIENT = 0.048f;
 
 	// Use this for initialization
 	void Start () {
 		bfScript = GetComponent<BallForce> ();
-		scoreKeep = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
+		distance = 0;
 	}
 	
 	// Update is called once per frame
@@ -29,21 +31,19 @@ public class ControlBall : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0))
 		{
 
-			if(!scoreKeep.getWin() && bfScript.getStop())
+			if(!scoreKeep.getWin() && !bfScript.getBallMoving())
 			{
-				if(distance>maxDistance)
-					distance = maxDistance;
-				else if(distance<minDistance)
-					distance = minDistance;
+				if(distance>MAX_DISTANCE)
+					distance = MAX_DISTANCE;
+				else if(distance<MIN_DISTANCE)
+					distance = MIN_DISTANCE;
 
 				bfScript.addHitForce((distance * FORCE) - DISTANCE_OFFSET);
-
-				//bfScript.addForce((distance * FORCE) - DISTANCE_OFFSET); //7500
 			}
 		}
 		//If the player does not left click then this updates the dirction the ball faces and the arrow.
 		else {
-			if(!scoreKeep.getWin() && bfScript.getStop())
+			if(!scoreKeep.getWin() && !bfScript.getBallMoving())
 			{
 				v3_transform = UpdateFacingDirection();
 
@@ -57,9 +57,7 @@ public class ControlBall : MonoBehaviour {
 			{
 				canvasArrow.enabled = false;
 			}
-
 		}
-
 	}
 
 	//Makes a variable that converts the mouse position to a 2-D position on the screen.
@@ -90,29 +88,12 @@ public class ControlBall : MonoBehaviour {
 		canvasArrow.transform.rotation = Quaternion.Euler(new Vector3(270, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z-90));
 		//canvasArrow.transform.position = new Vector3(canvasArrow.transform.position.x, canvasArrow.transform.position.y +300, canvasArrow.transform.position.z);
 
-		if(distance<=maxDistance && distance>=minDistance)
-			canvasArrow.transform.localScale = new Vector3(arrowScaleCoefficient*distance, arrowScaleCoefficient*distance, arrowScaleCoefficient*distance);
-		else if(distance>maxDistance)
-			canvasArrow.transform.localScale = new Vector3(arrowScaleCoefficient*maxDistance, arrowScaleCoefficient*maxDistance, arrowScaleCoefficient*maxDistance);
-		else if(distance<minDistance)
-			canvasArrow.transform.localScale = new Vector3(arrowScaleCoefficient*minDistance, arrowScaleCoefficient*minDistance, arrowScaleCoefficient*minDistance);
-
-		
-
-
-	}
-
-	void OnGUI()
-	{
-		//Vector3 ballPos = Camera.main.WorldToScreenPoint(transform.position);
-		if (bfScript.getStop ()) {
-			//GUI.DrawTexture (new Rect (ballPos.x - 100, Screen.height - 20 - ballPos.y, 100, 40), arrow);
-		}
-		//GUI.Label (new Rect (10, 10, 200, 20), "X: "+Input.mousePosition.x + "Y: " + Input.mousePosition.y + "Z: " + Input.mousePosition.z);
-		
-		//GUI.Label (new Rect (10, 30, 400, 20), "X: "+ballPos.x + "  Y: " + ballPos.y + "  Z: " + ballPos.z);
-		
-		//GUI.Label (new Rect (10, 50, 300, 20), " Distance: "+distance);
+		if(distance<=MAX_DISTANCE && distance>=MIN_DISTANCE)
+			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*distance, ARROW_SCALE_COEFFICIENT*distance, ARROW_SCALE_COEFFICIENT*distance);
+		else if(distance>MAX_DISTANCE)
+			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*MAX_DISTANCE, ARROW_SCALE_COEFFICIENT*MAX_DISTANCE, ARROW_SCALE_COEFFICIENT*MAX_DISTANCE);
+		else if(distance<MIN_DISTANCE)
+			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*MIN_DISTANCE, ARROW_SCALE_COEFFICIENT*MIN_DISTANCE, ARROW_SCALE_COEFFICIENT*MIN_DISTANCE);
 	}
 
 }

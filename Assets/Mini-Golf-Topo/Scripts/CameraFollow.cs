@@ -4,73 +4,93 @@ using System.Threading;
 
 public class CameraFollow : MonoBehaviour {
 
+	//Gets reference to GameObjects needed
 	public GameObject ball;
-	private bool fullScreen;
-	private Camera followCamera;
 	public GameObject cameraBorder;
+	private Camera followCamera;
 
-	private const int OFFSET = 30;
-	private  Vector2 VIEWPORT_COORDINATES = new Vector2(0.84f, 0.74f);
-	private  Vector2 VIEWPORT_SCALE = new Vector2(0.15f, 0.25f);
+	//Full screen variables
+	private bool startFullScreenAnimation;
+	private bool fullScreen;
 
-	private Vector2 CURR_VIEWPORT_COORDINATES;
-	private Vector2 CURR_VIEWPORT_SCALE;
+	//Default mini map coordinates and size
+	private Vector2 miniMapCoordinates;
+	private Vector2 miniMapScale;
 
+	//Constants needed to calculate camera position or the transition to full screen
+	private const int CAMERA_OFFSET = 30;
 	private const float FULL_SCREEN_BUFFER = 0.01f;
+	private const float FULL_SCREEN_COOR_SPEED = 0.09f;
+	private const float FULL_SCREEN_SCALE_SPEED = 0.03f;
 	
-	public bool fullyFullScreen = false;
-
 	// Use this for initialization
 	void Start () {
 		followCamera = GetComponent<Camera>();
-		CURR_VIEWPORT_COORDINATES = new Vector2(VIEWPORT_COORDINATES.x,  VIEWPORT_COORDINATES.y);
-		CURR_VIEWPORT_SCALE = new Vector2(VIEWPORT_SCALE.x, VIEWPORT_SCALE.y);
+
+		startFullScreenAnimation = false;
 		fullScreen = false;
-		//camera.aspect = 1;
+
+		miniMapCoordinates = new Vector2(0.84f, 0.74f);
+		miniMapScale = new Vector2(0.15f, 0.25f);
 
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		print (followCamera.rect.xMin +" "+ followCamera.rect.yMin +" "+ followCamera.rect.width + " "+ followCamera.rect.height + " " );
-		if(fullScreen)
+		if(startFullScreenAnimation)
 		{
-			followCamera.rect =  new Rect(Mathf.Lerp(followCamera.rect.xMin, 0.5f-followCamera.rect.width/2, 0.07f), Mathf.Lerp(followCamera.rect.yMin, 0.5f-followCamera.rect.height/2, 0.07f), Mathf.Lerp(followCamera.rect.width, 1, 0.02f), Mathf.Lerp(followCamera.rect.height, 1, 0.02f));
-			//cameraBorder.SetActive(false);
+			//Uses Lerp to transition the mini map from its position to full screen.  The target is to have it centered.
+			followCamera.rect =  new Rect(Mathf.Lerp(followCamera.rect.xMin, 0.5f-followCamera.rect.width/2, FULL_SCREEN_COOR_SPEED), Mathf.Lerp(followCamera.rect.yMin, 0.5f-followCamera.rect.height/2, FULL_SCREEN_COOR_SPEED), Mathf.Lerp(followCamera.rect.width, 1, FULL_SCREEN_SCALE_SPEED), Mathf.Lerp(followCamera.rect.height, 1, FULL_SCREEN_SCALE_SPEED));
+
+			//If the camera is closer than the screen buffer, the camera will be reset to full screen
 			if(followCamera.rect.xMin < FULL_SCREEN_BUFFER && followCamera.rect.yMin < FULL_SCREEN_BUFFER && followCamera.rect.width > 1 - FULL_SCREEN_BUFFER && followCamera.rect.height > 1- FULL_SCREEN_BUFFER)
 			{
+				//resets followCamera to full screen
 				followCamera.rect =  new Rect(0, 0, 1, 1);
-				fullyFullScreen = true;
+				fullScreen = true;
+				cameraBorder.SetActive(false);
 			}
-				
 			else 
-				fullyFullScreen = false;
-
+			{
+				fullScreen = false;
+			}
 		}
 		else
 		{
-			fullyFullScreen = false;
-			followCamera.rect =  new Rect(CURR_VIEWPORT_COORDINATES.x, CURR_VIEWPORT_COORDINATES.y, CURR_VIEWPORT_SCALE.x, CURR_VIEWPORT_SCALE.y);
+			//Resets followCamera to mini map
+			followCamera.rect =  new Rect(miniMapCoordinates.x, miniMapCoordinates.y, miniMapScale.x, miniMapScale.y);
+			fullScreen = false;
 			cameraBorder.SetActive(true);
 		}
-		
-		
-		transform.position = new Vector3(ball.transform.position.x - OFFSET, ball.transform.position.y + OFFSET, ball.transform.position.z - OFFSET);
-		//transform.rotation = Quaternion.LookRotation(ball.transform.position);
+		cameraController();
+
+	}
+
+	private void cameraController()
+	{
+		transform.position = new Vector3(ball.transform.position.x - CAMERA_OFFSET, ball.transform.position.y + CAMERA_OFFSET, ball.transform.position.z - CAMERA_OFFSET);
 		transform.LookAt(ball.transform.position);
 	}
 
-	public void setFullScreen(bool full)
+	public void initiateFullScreenAnimation()
 	{
-		fullScreen = full;
+		startFullScreenAnimation = true;
+	}
+
+	public void exitFullScreen()
+	{
+		startFullScreenAnimation = false;
+	}
+
+	public bool getFullScreenAnimation()
+	{
+		return startFullScreenAnimation;
 	}
 
 	public bool getFullScreen()
 	{
-		return fullyFullScreen;
+		return fullScreen;
 	}
-
-
 	
 }
