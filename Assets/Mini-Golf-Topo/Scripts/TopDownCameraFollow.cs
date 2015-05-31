@@ -20,7 +20,7 @@ public class TopDownCameraFollow : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		gameObject.transform.position = new Vector3(ball.transform.position.x , 500, ball.transform.position.z );
+		gameObject.transform.position = new Vector3(ball.transform.position.x , 200, ball.transform.position.z );
 	}
 
 }

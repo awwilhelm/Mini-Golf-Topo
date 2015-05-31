@@ -39,7 +39,7 @@ public class CameraFollow : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		if(startFullScreenAnimation)
+		if(startFullScreenAnimation || fullScreen)
 		{
 			//Uses Lerp to transition the mini map from its position to full screen.  The target is to have it centered.
 			followCamera.rect =  new Rect(Mathf.Lerp(followCamera.rect.xMin, 0.5f-followCamera.rect.width/2, FULL_SCREEN_COOR_SPEED*FULL_SCREEN_SPEED_MODIFIER), Mathf.Lerp(followCamera.rect.yMin, 0.5f-followCamera.rect.height/2, FULL_SCREEN_COOR_SPEED*FULL_SCREEN_SPEED_MODIFIER), Mathf.Lerp(followCamera.rect.width, 1, FULL_SCREEN_SCALE_SPEED*FULL_SCREEN_SPEED_MODIFIER), Mathf.Lerp(followCamera.rect.height, 1, FULL_SCREEN_SCALE_SPEED*FULL_SCREEN_SPEED_MODIFIER));
@@ -48,8 +48,9 @@ public class CameraFollow : MonoBehaviour {
 			if(followCamera.rect.xMin < FULL_SCREEN_BUFFER && followCamera.rect.yMin < FULL_SCREEN_BUFFER && followCamera.rect.width > 1 - FULL_SCREEN_BUFFER && followCamera.rect.height > 1- FULL_SCREEN_BUFFER)
 			{
 				//resets followCamera to full screen
-				followCamera.rect =  new Rect(0, 0, 1, 1);
+				makeFullScreen();
 				fullScreen = true;
+				startFullScreenAnimation = false;
 				cameraBorder.SetActive(false);
 			}
 			else 
@@ -81,7 +82,7 @@ public class CameraFollow : MonoBehaviour {
 
 	public void exitFullScreen()
 	{
-		startFullScreenAnimation = false;
+		fullScreen = false;
 	}
 
 	public bool getFullScreenAnimation()
@@ -92,6 +93,12 @@ public class CameraFollow : MonoBehaviour {
 	public bool getFullScreen()
 	{
 		return fullScreen;
+	}
+
+	public void makeFullScreen()
+	{
+		followCamera.rect =  new Rect(0, 0, 1, 1);
+		//startFullScreenAnimation = true;
 	}
 	
 }

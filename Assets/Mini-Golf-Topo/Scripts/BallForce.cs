@@ -11,12 +11,16 @@ public class BallForce : MonoBehaviour {
 	//Values related with the ball moving
 	private Vector3 ballPos;
 	private float hitForce;
-	private bool isBallMoving;
+	public bool isBallMoving;
 	private bool inHole;
 	private bool addForceBool;
 
 	//After ball is done moving after hit, mini map should exit full screen
-	private bool isBallMovingAfterHit = false;
+	private bool isBallMovingAfterHit;
+
+	//DEBUG play without mini-map animation
+	public bool animationAfterHit;
+	public bool fullScreenOnHit;
 
 	//Constant variables
 	private const float DELAY_BEFORE_BALL_HIT = 0.25f;
@@ -31,42 +35,44 @@ public class BallForce : MonoBehaviour {
 		inHole =  false;
 		addForceBool = false;
 
+		animationAfterHit = true;
+		fullScreenOnHit = false;
+
 		isBallMovingAfterHit = false;
 	}
 	
 	void FixedUpdate()
 	{
 		//If the player has clicked, wants to add force, and is in full screen. Adds force.
-		if(addForceBool && cameraFollow.getFullScreen())
+		if(addForceBool && (cameraFollow.getFullScreen() || !animationAfterHit))
 		{
 			addForceBool = false;
 			StartCoroutine(addForce(hitForce));
 
 		}
+
 		if((Mathf.Abs (ballRigidbody.velocity.x) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.y) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.z) < MIN_BALL_VELOCITY))
 		{
-			transform.position = ballPos;
 			ballRigidbody.velocity = new Vector3 (0, 0, 0);
-			isBallMoving = false;
+			ballRigidbody.angularVelocity = new Vector3 (0, 0, 0);
 
 			//WINNER
 			if(inHole)
 			{
 				scoreKeep.setWin();
 			}
-			else if(cameraFollow.getFullScreen() && isBallMovingAfterHit)
+			else if(cameraFollow.getFullScreen() && isBallMovingAfterHit && isBallMoving)
 			{
 				cameraFollow.exitFullScreen();
 				isBallMovingAfterHit = false;
 			}
+			isBallMoving = false;
+
 		}
 		else
 		{
-			ballPos = transform.position;
 			isBallMoving = true;
-			isBallMovingAfterHit = true;
 		}
-
 	}
 
 	//Add a force to the ball and adds the hit to scorekeeping.
@@ -74,11 +80,14 @@ public class BallForce : MonoBehaviour {
 	{
 		Vector3 forward = new Vector3 (transform.forward.x, 0, transform.forward.z);
 
-		yield return new WaitForSeconds(DELAY_BEFORE_BALL_HIT);
+		if(animationAfterHit || fullScreenOnHit)
+			yield return new WaitForSeconds(DELAY_BEFORE_BALL_HIT);
 
 		ballRigidbody.AddForce (forward * force);
 		scoreKeep.addToHits ();
 		scoreKeep.addToScore ();
+
+		isBallMovingAfterHit = true;
 	}
 
 	//Checks if the ball entered the hole
@@ -108,7 +117,12 @@ public class BallForce : MonoBehaviour {
 	{
 		hitForce = force;
 		addForceBool = true;
-		cameraFollow.initiateFullScreenAnimation();
+
+		if(animationAfterHit)
+			cameraFollow.initiateFullScreenAnimation();
+		else if(fullScreenOnHit)
+			cameraFollow.makeFullScreen();
+
 	}
 
 }

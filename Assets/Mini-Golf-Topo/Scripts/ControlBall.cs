@@ -13,8 +13,8 @@ public class ControlBall : MonoBehaviour {
 	private float distance;
 	private Vector3 v3_transform;
 
-	private const int FORCE = 15000;
-	private const int DISTANCE_OFFSET = 20000;
+	private const int FORCE = 35000;
+	private const int DISTANCE_OFFSET = 5000;
 	private const float MAX_DISTANCE = 20;
 	private const float MIN_DISTANCE = 3;
 	private const float ARROW_SCALE_COEFFICIENT = 0.048f;
@@ -26,7 +26,7 @@ public class ControlBall : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
 		//If player left-clicks add force
 		if (Input.GetMouseButtonDown (0))
 		{
