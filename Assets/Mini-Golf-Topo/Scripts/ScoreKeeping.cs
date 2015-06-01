@@ -4,26 +4,29 @@ using UnityEngine.UI;
 
 public class ScoreKeeping : MonoBehaviour {
 
+	public GameObject panel;
+	public Text textScore;
+	public Text hitsOutOfPar;
+
 	private bool won;
 	private int score;
 	private int hits;
-	public Text textScore;
-	public Text hitsScore;
-	public Text hitsForHole;
-	public GameObject panel;
+	private int parForHole;
+	private int sumPar;
 
 	// Use this for initialization
 	void Start () {
 		won = false;
-		score = 0;
+		score = 11;
 		hits = 0;
+		parForHole = 3;
+		sumPar = 15;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		textScore.text = score+"/30";
-		hitsScore.text = ""+hits;
-		hitsForHole.text = "3";
+		textScore.text = score+"/"+sumPar;
+		hitsOutOfPar.text = hits + "/" + parForHole;
 		if (won == true) {
 			panel.SetActive(true);
 		} else {
@@ -31,14 +34,10 @@ public class ScoreKeeping : MonoBehaviour {
 		}
 	}
 
-	public void addToScore()
-	{
-		score+=5;
-	}
-
 	public void addToHits()
 	{
 		hits++;
+		score++;
 	}
 
 	public int getScore()

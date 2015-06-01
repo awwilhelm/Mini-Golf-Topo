@@ -4,14 +4,13 @@ using System.Collections;
 public class BallForce : MonoBehaviour {
 
 	//Gets component reference
-	public ScoreKeeping scoreKeep;
+	public ScoreKeeping scoreKeepingScript;
 	public CameraFollow cameraFollow;
 	private Rigidbody ballRigidbody;
 
 	//Values related with the ball moving
-	private Vector3 ballPos;
 	private float hitForce;
-	public bool isBallMoving;
+	private bool isBallMoving;
 	private bool inHole;
 	private bool addForceBool;
 
@@ -29,7 +28,6 @@ public class BallForce : MonoBehaviour {
 	void Start () {
 		ballRigidbody = GetComponent<Rigidbody> ();
 
-		ballPos = transform.position;
 		hitForce = 0;
 		isBallMoving = false;
 		inHole =  false;
@@ -59,7 +57,7 @@ public class BallForce : MonoBehaviour {
 			//WINNER
 			if(inHole)
 			{
-				scoreKeep.setWin();
+				scoreKeepingScript.setWin();
 			}
 			else if(cameraFollow.getFullScreen() && isBallMovingAfterHit && isBallMoving)
 			{
@@ -84,8 +82,6 @@ public class BallForce : MonoBehaviour {
 			yield return new WaitForSeconds(DELAY_BEFORE_BALL_HIT);
 
 		ballRigidbody.AddForce (forward * force);
-		scoreKeep.addToHits ();
-		scoreKeep.addToScore ();
 
 		isBallMovingAfterHit = true;
 	}
@@ -110,6 +106,16 @@ public class BallForce : MonoBehaviour {
 	public bool getBallMoving()
 	{
 		return isBallMoving;
+	}
+
+	public bool getBallMovingAfterHit()
+	{
+		return isBallMovingAfterHit;
+	}
+
+	public bool getAddForceBool()
+	{
+		return addForceBool;
 	}
 
 	//Allows the animation to fully play through before hitting the ball

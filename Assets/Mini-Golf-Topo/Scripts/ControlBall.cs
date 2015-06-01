@@ -7,21 +7,28 @@ public class ControlBall : MonoBehaviour {
 	
 	public Texture arrow;
 	public Canvas canvasArrow;
-	public ScoreKeeping scoreKeep;
+	public GameObject camera3D;
+	public GameObject scoreKeepingObject;
+	private ScoreKeeping scoreKeepingScript;	
 	private BallForce bfScript;
+	private CameraFollow cameraFollowScript;
 
 	private float distance;
 	private Vector3 v3_transform;
 
-	private const int FORCE = 35000;
+	private const int FORCE_MULTIPLIER = 35000;
 	private const int DISTANCE_OFFSET = 5000;
 	private const float MAX_DISTANCE = 20;
-	private const float MIN_DISTANCE = 3;
+	private const float MIN_DISTANCE = 1;
+	private const float MAX_ARROW_SCALE = 25;
+	private const float MIN_ARROW_SCALE = 3;
 	private const float ARROW_SCALE_COEFFICIENT = 0.048f;
 
 	// Use this for initialization
 	void Start () {
 		bfScript = GetComponent<BallForce> ();
+		cameraFollowScript = camera3D.GetComponent<CameraFollow>();
+		scoreKeepingScript = scoreKeepingObject.GetComponent<ScoreKeeping>();
 		distance = 0;
 	}
 	
@@ -31,19 +38,21 @@ public class ControlBall : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0))
 		{
 
-			if(!scoreKeep.getWin() && !bfScript.getBallMoving())
+			if(!scoreKeepingScript.getWin() && !bfScript.getBallMoving())
 			{
-				if(distance>MAX_DISTANCE)
-					distance = MAX_DISTANCE;
-				else if(distance<MIN_DISTANCE)
-					distance = MIN_DISTANCE;
+				scoreKeepingScript.addToHits();
 
-				bfScript.addHitForce((distance * FORCE) - DISTANCE_OFFSET);
+				//Scales arrow scale percent to force
+				float arrowScalePercent, force;
+				arrowScalePercent = (distance+MIN_ARROW_SCALE)/(MIN_ARROW_SCALE+MAX_ARROW_SCALE);
+				force = arrowScalePercent*(MIN_DISTANCE+MAX_DISTANCE) - MIN_DISTANCE;
+
+				bfScript.addHitForce((force * FORCE_MULTIPLIER) - DISTANCE_OFFSET);
 			}
 		}
 		//If the player does not left click then this updates the dirction the ball faces and the arrow.
 		else {
-			if(!scoreKeep.getWin() && !bfScript.getBallMoving())
+			if(!scoreKeepingScript.getWin() && !bfScript.getBallMoving() && !cameraFollowScript.getFullScreenAnimation() && !cameraFollowScript.getFullScreen())
 			{
 				v3_transform = UpdateFacingDirection();
 
@@ -83,17 +92,24 @@ public class ControlBall : MonoBehaviour {
 	//Sets the arrows position and rotation.  Also adjusts the scale of the arrow.
 	private void UpdateArrow(Vector3 v3T)
 	{
-		canvasArrow.transform.position = new Vector3(transform.position.x, 99, transform.position.z);
+		canvasArrow.transform.position = new Vector3(transform.position.x, 100, transform.position.z);
 		canvasArrow.transform.rotation = Quaternion.LookRotation(new Vector3(v3T.x, v3T.y, v3T.z));
 		canvasArrow.transform.rotation = Quaternion.Euler(new Vector3(270, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z-90));
-		//canvasArrow.transform.position = new Vector3(canvasArrow.transform.position.x, canvasArrow.transform.position.y +300, canvasArrow.transform.position.z);
 
-		if(distance<=MAX_DISTANCE && distance>=MIN_DISTANCE)
+		if(distance<=MAX_ARROW_SCALE && distance>=MIN_ARROW_SCALE)
+		{
 			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*distance, ARROW_SCALE_COEFFICIENT*distance, ARROW_SCALE_COEFFICIENT*distance);
-		else if(distance>MAX_DISTANCE)
-			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*MAX_DISTANCE, ARROW_SCALE_COEFFICIENT*MAX_DISTANCE, ARROW_SCALE_COEFFICIENT*MAX_DISTANCE);
-		else if(distance<MIN_DISTANCE)
-			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*MIN_DISTANCE, ARROW_SCALE_COEFFICIENT*MIN_DISTANCE, ARROW_SCALE_COEFFICIENT*MIN_DISTANCE);
+		}
+		else if(distance>MAX_ARROW_SCALE)
+		{
+			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*MAX_ARROW_SCALE, ARROW_SCALE_COEFFICIENT*MAX_ARROW_SCALE, ARROW_SCALE_COEFFICIENT*MAX_ARROW_SCALE);
+			distance = MAX_ARROW_SCALE;
+		}
+		else if(distance<MIN_ARROW_SCALE)
+		{
+			canvasArrow.transform.localScale = new Vector3(ARROW_SCALE_COEFFICIENT*MIN_ARROW_SCALE, ARROW_SCALE_COEFFICIENT*MIN_ARROW_SCALE, ARROW_SCALE_COEFFICIENT*MIN_ARROW_SCALE);
+			distance = MIN_ARROW_SCALE;
+		}
 	}
 
 }
