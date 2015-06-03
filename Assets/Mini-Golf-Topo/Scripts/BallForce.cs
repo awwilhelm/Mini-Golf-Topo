@@ -13,9 +13,11 @@ public class BallForce : MonoBehaviour {
 	private bool isBallMoving;
 	private bool inHole;
 	private bool addForceBool;
+	private float lastTimeBallStopped=0;
+	private bool stopBuffer = false;
 
 	//After ball is done moving after hit, mini map should exit full screen
-	private bool isBallMovingAfterHit;
+	private bool hasBallBeenHitForStroke;
 
 	//DEBUG play without mini-map animation
 	public bool animationAfterHit;
@@ -23,10 +25,12 @@ public class BallForce : MonoBehaviour {
 
 	//Constant variables
 	private const float DELAY_BEFORE_BALL_HIT = 0.25f;
-	private const float MIN_BALL_VELOCITY = 1f;
+	private const float MIN_BALL_VELOCITY = 0.5f;
+	private const float STOP_BUFFER_TIME = 0.1f;
 
 	void Start () {
 		ballRigidbody = GetComponent<Rigidbody> ();
+		ballRigidbody.maxAngularVelocity = 20;
 
 		hitForce = 0;
 		isBallMoving = false;
@@ -36,10 +40,10 @@ public class BallForce : MonoBehaviour {
 		animationAfterHit = true;
 		fullScreenOnHit = false;
 
-		isBallMovingAfterHit = false;
+		hasBallBeenHitForStroke = false;
 	}
 	
-	void FixedUpdate()
+	void Update()
 	{
 		//If the player has clicked, wants to add force, and is in full screen. Adds force.
 		if(addForceBool && (cameraFollow.getFullScreen() || !animationAfterHit))
@@ -49,27 +53,37 @@ public class BallForce : MonoBehaviour {
 
 		}
 
-		if((Mathf.Abs (ballRigidbody.velocity.x) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.y) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.z) < MIN_BALL_VELOCITY))
+		//The balls velocity has to be stopped for a certain time and if it is, the ball will finally be considered stopped.
+		if(Time.time - lastTimeBallStopped > STOP_BUFFER_TIME && stopBuffer)
 		{
-			ballRigidbody.velocity = new Vector3 (0, 0, 0);
-			ballRigidbody.angularVelocity = new Vector3 (0, 0, 0);
-
 			//WINNER
 			if(inHole)
 			{
 				scoreKeepingScript.setWin();
 			}
-			else if(cameraFollow.getFullScreen() && isBallMovingAfterHit && isBallMoving)
+			else if(cameraFollow.getFullScreen() && hasBallBeenHitForStroke)
 			{
+				ballRigidbody.velocity = Vector3.zero;
+				ballRigidbody.angularVelocity = Vector3.zero;
 				cameraFollow.exitFullScreen();
-				isBallMovingAfterHit = false;
+				hasBallBeenHitForStroke = false;
 			}
-			isBallMoving = false;
-
 		}
-		else
+		else if(!stopBuffer)
+		{
+			lastTimeBallStopped = Time.time;
+			stopBuffer = true;
+		}
+
+		//Tests if the velocity is close to being stopped
+		if((Mathf.Abs (ballRigidbody.velocity.x) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.y) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.z) < MIN_BALL_VELOCITY))
+		{
+			isBallMoving = false;
+		}
+		else if(hasBallBeenHitForStroke == true)
 		{
 			isBallMoving = true;
+			stopBuffer = false;
 		}
 	}
 
@@ -81,9 +95,10 @@ public class BallForce : MonoBehaviour {
 		if(animationAfterHit || fullScreenOnHit)
 			yield return new WaitForSeconds(DELAY_BEFORE_BALL_HIT);
 
-		ballRigidbody.AddForce (forward * force);
+		ballRigidbody.AddForce (forward * force, ForceMode.Impulse);
 
-		isBallMovingAfterHit = true;
+		hasBallBeenHitForStroke = true;
+		lastTimeBallStopped = Time.time;
 	}
 
 	//Checks if the ball entered the hole
@@ -106,16 +121,6 @@ public class BallForce : MonoBehaviour {
 	public bool getBallMoving()
 	{
 		return isBallMoving;
-	}
-
-	public bool getBallMovingAfterHit()
-	{
-		return isBallMovingAfterHit;
-	}
-
-	public bool getAddForceBool()
-	{
-		return addForceBool;
 	}
 
 	//Allows the animation to fully play through before hitting the ball

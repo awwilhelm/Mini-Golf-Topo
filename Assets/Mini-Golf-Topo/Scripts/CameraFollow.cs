@@ -33,7 +33,6 @@ public class CameraFollow : MonoBehaviour {
 
 		miniMapCoordinates = new Vector2(0.84f, 0.74f);
 		miniMapScale = new Vector2(0.15f, 0.25f);
-
 	}
 	
 	// Update is called once per frame
@@ -66,7 +65,6 @@ public class CameraFollow : MonoBehaviour {
 			cameraBorder.SetActive(true);
 		}
 		cameraController();
-
 	}
 
 	private void cameraController()
@@ -98,7 +96,6 @@ public class CameraFollow : MonoBehaviour {
 	public void makeFullScreen()
 	{
 		followCamera.rect =  new Rect(0, 0, 1, 1);
-		//startFullScreenAnimation = true;
 	}
 	
 }

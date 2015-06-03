@@ -3,7 +3,8 @@ using System.Collections;
 using System.Threading;
 
 public class ControlBall : MonoBehaviour {
-	
+
+	//Contains instances of GameObjects and scripts
 	public Canvas canvasArrow;
 	public RectTransform arrowHead;
 	public RectTransform arrowTail;
@@ -13,13 +14,15 @@ public class ControlBall : MonoBehaviour {
 	private BallForce bfScript;
 	private CameraFollow cameraFollowScript;
 
+	//Deals with mouse position on screen and where it is
 	private float distance;
 	private Vector3 v3_transform;
 
-	private const int FORCE_MULTIPLIER = 35000;
-	private const int DISTANCE_OFFSET = 5000;
-	private const float MAX_DISTANCE = 20;
-	private const float MIN_DISTANCE = 1;
+	//Used for scaling and how much power to use to hit the ball
+	private const int DISTANCE_OFFSET = 15000;
+	private const float FORCE_CURVE_SCALE = -1/4000000.0f;
+	private const float MAX_POWER = 20;
+	private const float MIN_POWER = 1;
 	private const float MAX_ARROW_SCALE = 40;
 	private const float MIN_ARROW_SCALE = 10;
 	private const float ARROW_HEAD_SCALE_COEFFICIENT = 3;
@@ -28,12 +31,13 @@ public class ControlBall : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		bfScript = GetComponent<BallForce> ();
-		cameraFollowScript = camera3D.GetComponent<CameraFollow>();
-		scoreKeepingScript = scoreKeepingObject.GetComponent<ScoreKeeping>();
-		distance = 0;
 		arrowHead.sizeDelta = new Vector2(arrowHead.rect.width * ARROW_HEAD_SCALE_COEFFICIENT, arrowHead.rect.height * ARROW_HEAD_SCALE_COEFFICIENT);
 		arrowTail.sizeDelta = new Vector2(arrowTail.rect.width, arrowTail.rect.height * ARROW_TAIL_SCALE_COEFFICIENT);
+		scoreKeepingScript = scoreKeepingObject.GetComponent<ScoreKeeping>();
+		bfScript = GetComponent<BallForce> ();
+		cameraFollowScript = camera3D.GetComponent<CameraFollow>();
+
+		distance = 0;
 	}
 	
 	// Update is called once per frame
@@ -47,11 +51,14 @@ public class ControlBall : MonoBehaviour {
 				scoreKeepingScript.addToHits();
 
 				//Scales arrow scale percent to force
-				float arrowScalePercent, force;
-				arrowScalePercent = (distance-MIN_ARROW_SCALE)/(MAX_ARROW_SCALE);
-				force = arrowScalePercent*MAX_DISTANCE + MIN_DISTANCE;
+				float arrowScalePercent, force, forceCurve;
+				arrowScalePercent = (distance-MIN_ARROW_SCALE)/(MAX_ARROW_SCALE-MIN_ARROW_SCALE);
+				force = arrowScalePercent*(MAX_POWER-MIN_POWER) + MIN_POWER;
 
-				bfScript.addHitForce((force * FORCE_MULTIPLIER) - DISTANCE_OFFSET);
+				//Exponential curve used to determin how much power to hit the ball with
+				forceCurve = -Mathf.Sqrt((force-MAX_POWER)/FORCE_CURVE_SCALE) + DISTANCE_OFFSET;
+
+				bfScript.addHitForce(forceCurve);
 			}
 		}
 		//If the player does not left click then this updates the dirction the ball faces and the arrow.
@@ -106,7 +113,7 @@ public class ControlBall : MonoBehaviour {
 		{
 			arrowTail.sizeDelta = new Vector2(distance - ARROW_TAIL_MOUSE_OFFEST, arrowTail.rect.height);
 		}
-		else if(distance>MAX_ARROW_SCALE + MIN_ARROW_SCALE)
+		else if(distance>MAX_ARROW_SCALE)
 		{
 			arrowTail.sizeDelta = new Vector2(MAX_ARROW_SCALE - ARROW_TAIL_MOUSE_OFFEST, arrowTail.rect.height);
 			distance = MAX_ARROW_SCALE;
