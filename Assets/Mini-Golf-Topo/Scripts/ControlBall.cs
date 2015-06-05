@@ -19,10 +19,10 @@ public class ControlBall : MonoBehaviour {
 	private Vector3 v3_transform;
 
 	//Used for scaling and how much power to use to hit the ball
-	private const int DISTANCE_OFFSET = 17000;
+	private const int DISTANCE_OFFSET = 30000;
 	private const float FORCE_CURVE_SCALE = -1/12000000.0f;
-	private const float MAX_POWER = 20;
-	private const float MIN_POWER = 1;
+	private const float MAX_POWER = 10;
+	private const float MIN_POWER = 0;
 	private const float MAX_ARROW_SCALE = 40;
 	private const float MIN_ARROW_SCALE = 10;
 	private const float ARROW_HEAD_SCALE_COEFFICIENT = 3;
@@ -55,8 +55,7 @@ public class ControlBall : MonoBehaviour {
 				arrowScalePercent = (distance-MIN_ARROW_SCALE)/(MAX_ARROW_SCALE-MIN_ARROW_SCALE);
 				force = arrowScalePercent*(MAX_POWER-MIN_POWER) + MIN_POWER;
 
-				//Exponential curve used to determin how much power to hit the ball with
-				forceCurve = -Mathf.Sqrt((force-MAX_POWER)/FORCE_CURVE_SCALE) + DISTANCE_OFFSET;
+				forceCurve = 2750 * force + 300;
 
 				bfScript.addHitForce(forceCurve);
 			}

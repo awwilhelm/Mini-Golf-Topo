@@ -95,7 +95,7 @@ public class BallForce : MonoBehaviour {
 		if(animationAfterHit || fullScreenOnHit)
 			yield return new WaitForSeconds(DELAY_BEFORE_BALL_HIT);
 
-		ballRigidbody.AddForce (forward * force, ForceMode.Impulse);
+		ballRigidbody.AddForce (forward * force, ForceMode.Acceleration);
 
 		hasBallBeenHitForStroke = true;
 		lastTimeBallStopped = Time.time;
