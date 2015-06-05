@@ -19,8 +19,8 @@ public class ControlBall : MonoBehaviour {
 	private Vector3 v3_transform;
 
 	//Used for scaling and how much power to use to hit the ball
-	private const int DISTANCE_OFFSET = 15000;
-	private const float FORCE_CURVE_SCALE = -1/4000000.0f;
+	private const int DISTANCE_OFFSET = 17000;
+	private const float FORCE_CURVE_SCALE = -1/12000000.0f;
 	private const float MAX_POWER = 20;
 	private const float MIN_POWER = 1;
 	private const float MAX_ARROW_SCALE = 40;
