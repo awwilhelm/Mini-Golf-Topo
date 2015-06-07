@@ -61,7 +61,6 @@ SubShader {
     float _WaterLevel;
     float4 _WaterColor;
     void surf (Input IN, inout SurfaceOutput o) {
-    	
     	if (IN.worldPos.y >= _PeakLevel)
     		o.Albedo = _PeakColor;
         else if (IN.worldPos.y >= _Level8)
@@ -81,30 +80,7 @@ SubShader {
         else if (IN.worldPos.y >= _Level1)
         	o.Albedo = _Level1Color;
         else
-        	o.Albedo = _WaterColor;
-            
-    
-//		if (IN.worldPos.y <= _WaterLevel)
-//        	o.Albedo = _WaterColor;
-//        else if (IN.worldPos.y <= _Level1)
-//        	o.Albedo = _Level1Color;	
-//        else if (IN.worldPos.y <= _Level2)
-//        	o.Albedo = _Level2Color;
-//        else if (IN.worldPos.y <= _Level3)
-//        	o.Albedo = _Level3Color;
-//        else if (IN.worldPos.y <= _Level4)
-//        	o.Albedo = _Level4Color;
-//        else if (IN.worldPos.y <= _Level5)
-//        	o.Albedo = _Level5Color;
-//        else if (IN.worldPos.y <= _Level6)
-//        	o.Albedo = _Level6Color;
-//        else if (IN.worldPos.y <= _Level7)
-//        	o.Albedo = _Level7Color;																																
-//        else if (IN.worldPos.y <= _Level8)
-//        	o.Albedo = _Level8Color;   
-//        else
-//            o.Albedo = _PeakColor;
-        //o.Albedo *= saturate(IN.customColor + _Slope);          
+        	o.Albedo = _WaterColor; 
     }
     ENDCG
 }

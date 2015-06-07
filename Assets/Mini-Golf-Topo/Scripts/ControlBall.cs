@@ -13,6 +13,7 @@ public class ControlBall : MonoBehaviour {
 	private ScoreKeeping scoreKeepingScript;	
 	private BallForce bfScript;
 	private CameraFollow cameraFollowScript;
+	private CanvasRenderer arrowTailRenderer;
 
 	//Deals with mouse position on screen and where it is
 	private float distance;
@@ -36,7 +37,7 @@ public class ControlBall : MonoBehaviour {
 		scoreKeepingScript = scoreKeepingObject.GetComponent<ScoreKeeping>();
 		bfScript = GetComponent<BallForce> ();
 		cameraFollowScript = camera3D.GetComponent<CameraFollow>();
-
+		arrowTailRenderer = arrowTail.GetComponent<CanvasRenderer>();
 		distance = 0;
 	}
 	
@@ -111,6 +112,9 @@ public class ControlBall : MonoBehaviour {
 		if(distance<=MAX_ARROW_SCALE && distance>=MIN_ARROW_SCALE)
 		{
 			arrowTail.sizeDelta = new Vector2(distance - ARROW_TAIL_MOUSE_OFFEST, arrowTail.rect.height);
+			arrowTailRenderer.GetMaterial().SetFloat("_TexWidth",  distance - ARROW_TAIL_MOUSE_OFFEST);
+			//print (arrowTailRenderer.GetMaterial().GetFloat("_TexWidth"));
+			//arrowTailRenderer.material.SetFloat("_TexWidth",  distance - ARROW_TAIL_MOUSE_OFFEST);
 		}
 		else if(distance>MAX_ARROW_SCALE)
 		{
