@@ -37,8 +37,8 @@ public class BallForce : MonoBehaviour {
 		inHole =  false;
 		addForceBool = false;
 
-		animationAfterHit = true;
-		fullScreenOnHit = false;
+		animationAfterHit = false;
+		fullScreenOnHit = true;
 
 		hasBallBeenHitForStroke = false;
 	}

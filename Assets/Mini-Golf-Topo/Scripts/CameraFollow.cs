@@ -48,7 +48,6 @@ public class CameraFollow : MonoBehaviour {
 			{
 				//resets followCamera to full screen
 				makeFullScreen();
-				fullScreen = true;
 				startFullScreenAnimation = false;
 				cameraBorder.SetActive(false);
 			}
@@ -96,6 +95,7 @@ public class CameraFollow : MonoBehaviour {
 	public void makeFullScreen()
 	{
 		followCamera.rect =  new Rect(0, 0, 1, 1);
+		fullScreen = true;
 	}
 	
 }
