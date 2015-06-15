@@ -21,6 +21,7 @@ public class ScoreKeeping : MonoBehaviour {
 		hits = 0;
 		parForHole = 3;
 		sumPar = 15;
+		DontDestroyOnLoad(this);
 	}
 	
 	// Update is called once per frame
@@ -50,9 +51,9 @@ public class ScoreKeeping : MonoBehaviour {
 		return hits;
 	}
 
-	public void setWin()
+	public void setWin(bool win)
 	{
-		won = true;
+		won = win;
 	}
 
 	public bool getWin()

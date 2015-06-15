@@ -59,7 +59,7 @@ public class BallForce : MonoBehaviour {
 			//WINNER
 			if(inHole)
 			{
-				scoreKeepingScript.setWin();
+				scoreKeepingScript.setWin(true);
 			}
 			else if(cameraFollow.getFullScreen() && hasBallBeenHitForStroke)
 			{
