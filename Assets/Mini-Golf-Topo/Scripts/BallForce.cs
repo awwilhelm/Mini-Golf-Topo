@@ -26,7 +26,7 @@ public class BallForce : MonoBehaviour {
 	//Constant variables
 	private const float DELAY_BEFORE_BALL_HIT = 0.25f;
 	private const float MIN_BALL_VELOCITY = 0.5f;
-	private const float STOP_BUFFER_TIME = 0.1f;
+	private const float STOP_BUFFER_TIME = 0.25f;
 
 	void Start () {
 		ballRigidbody = GetComponent<Rigidbody> ();

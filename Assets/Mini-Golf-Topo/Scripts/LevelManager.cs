@@ -7,8 +7,12 @@ public class LevelManager : MonoBehaviour {
 
 	//startingLevel is the index of levelOrder
 	public int startingLevel;
+	public Material coloredLevels;
+	public Material dashedLines;
+	private Material currentMaterial;
 	private int currentLevel;
 	private int[] levelOrder;
+	private GameObject[] obstacles;
 
 	void Start ()
 	{
@@ -21,12 +25,16 @@ public class LevelManager : MonoBehaviour {
 			startingLevel = 1;
 
 		currentLevel = startingLevel-1;
-		loadNextLevel(currentLevel);
+		loadNextLevel();
 	}
 
 	void OnLevelWasLoaded(int level)
 	{
 		scoreKeepingScript = GameObject.Find("Scene").transform.Find("World").GetComponent<ScoreKeeping>();
+		transform.FindChild("Canvas").GetComponent<Canvas>().worldCamera = Camera.main;
+		addObstacles();
+		currentMaterial = dashedLines;
+		setMaterialType(currentMaterial);
 	}
 
 	void Update ()
@@ -35,12 +43,13 @@ public class LevelManager : MonoBehaviour {
 		{
 			scoreKeepingScript.setWin(false);
 			currentLevel++;
-			loadNextLevel(currentLevel);
+			loadNextLevel();
 		}
 	}
 
-	void loadNextLevel(int level)
+	void loadNextLevel()
 	{
+		removeAllObstacles();
 		if(levelOrder[currentLevel]<10)
 		{
 			Application.LoadLevel("Level0"+levelOrder[currentLevel]+"F");
@@ -51,4 +60,46 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 
+	public void restartLevel()
+	{
+		loadNextLevel();
+	}
+
+	public void nextLevel()
+	{
+		currentLevel++;
+		loadNextLevel();
+	}
+
+	public void toggleMaterial()
+	{
+		if(currentMaterial == dashedLines)
+		{
+			currentMaterial = coloredLevels;
+			setMaterialType(currentMaterial);
+		}
+		else
+		{
+			currentMaterial = dashedLines;
+			setMaterialType(currentMaterial);
+		}
+	}
+
+	private void addObstacles()
+	{
+		obstacles = GameObject.FindGameObjectsWithTag("Obstacle");
+	}
+
+	private void removeAllObstacles()
+	{
+		obstacles = null;
+	}
+
+	private void setMaterialType(Material mat)
+	{
+		foreach(GameObject obstacle in obstacles)
+		{
+			obstacle.GetComponent<Renderer>().material = mat;
+		}
+	}
 }
