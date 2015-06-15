@@ -97,7 +97,6 @@ public class ControlBall : MonoBehaviour {
 
 		//Without this the arrow moves based on the percentage of the screen the mouse is on.
 		temp_transform = temp_transform * 10000.0f + transform.position;
-		
 
 		return temp_transform;
 	}

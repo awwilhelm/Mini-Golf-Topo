@@ -41,7 +41,7 @@ public class LevelManager : MonoBehaviour {
 
 	void loadNextLevel(int level)
 	{
-		if(currentLevel<10)
+		if(levelOrder[currentLevel]<10)
 		{
 			Application.LoadLevel("Level0"+levelOrder[currentLevel]+"F");
 		}
