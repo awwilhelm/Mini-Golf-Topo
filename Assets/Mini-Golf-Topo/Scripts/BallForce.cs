@@ -23,6 +23,9 @@ public class BallForce : MonoBehaviour {
 	public bool animationAfterHit;
 	public bool fullScreenOnHit;
 
+	private int inBoundsCount;
+	private Vector3 lastPosition;
+
 	//Constant variables
 	private const float DELAY_BEFORE_BALL_HIT = 0.25f;
 	private const float MIN_BALL_VELOCITY = 0.5f;
@@ -41,6 +44,9 @@ public class BallForce : MonoBehaviour {
 		fullScreenOnHit = true;
 
 		hasBallBeenHitForStroke = false;
+
+		inBoundsCount = 0;
+		lastPosition = transform.position;
 	}
 	
 	void Update()
@@ -63,14 +69,20 @@ public class BallForce : MonoBehaviour {
 			}
 			else if(cameraFollow.getFullScreen() && hasBallBeenHitForStroke)
 			{
-				ballRigidbody.velocity = Vector3.zero;
-				ballRigidbody.angularVelocity = Vector3.zero;
-				cameraFollow.exitFullScreen();
-				hasBallBeenHitForStroke = false;
+				stopBall();
+				if(inBoundsCount <= 0)
+				{
+					transform.position = lastPosition;
+				}
+				else
+				{
+					lastPosition = transform.position;
+				}
 			}
 		}
 		else if(!stopBuffer)
 		{
+			//Sets the timer for how long the ball needs to be stopped
 			lastTimeBallStopped = Time.time;
 			stopBuffer = true;
 		}
@@ -107,6 +119,10 @@ public class BallForce : MonoBehaviour {
 		{
 			inHole = true;
 		}
+		else if(collided.transform.tag == "InBounds")
+		{
+			inBoundsCount++;
+		}
 	}
 
 	//Checks if the ball leaves the hole
@@ -114,6 +130,15 @@ public class BallForce : MonoBehaviour {
 		if(collided.transform.tag == "Hole" )
 		{
 			inHole = false;
+		}
+		else if(collided.transform.tag == "InBounds")
+		{
+			inBoundsCount--;
+		}
+		else if(collided.transform.tag == "OutOfBounds")
+		{
+			stopBall();
+			transform.position = lastPosition;
 		}
 	}
 
@@ -136,4 +161,11 @@ public class BallForce : MonoBehaviour {
 
 	}
 
+	private void stopBall()
+	{
+		ballRigidbody.velocity = Vector3.zero;
+		ballRigidbody.angularVelocity = Vector3.zero;
+		cameraFollow.exitFullScreen();
+		hasBallBeenHitForStroke = false;
+	}
 }
