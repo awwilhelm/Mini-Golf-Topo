@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LevelManager : MonoBehaviour {
+public class LevelManager : MonoBehaviour
+{
 
 	private ScoreKeeping scoreKeepingScript;
 
@@ -13,93 +14,140 @@ public class LevelManager : MonoBehaviour {
 	private int currentLevel;
 	private int[] levelOrder;
 	private GameObject[] obstacles;
+	private bool mouseOverUI;
+	private GameObject mainMenu;
 
 	void Start ()
 	{
-		DontDestroyOnLoad(this);
+		DontDestroyOnLoad (this);
 
 		//Change the numbers to customize the order of the levels
-		levelOrder = new int[32] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
+		levelOrder = new int[32] {
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
+			10,
+			11,
+			12,
+			13,
+			14,
+			15,
+			17,
+			18,
+			20,
+			21,
+			22,
+			23,
+			25,
+			26,
+			27,
+			28,
+			29,
+			30,
+			31,
+			32,
+			33,
+			34,
+			35
+		};
 
-		if(startingLevel<1)
+		if (startingLevel < 1)
 			startingLevel = 1;
 
-		currentLevel = startingLevel-1;
-		loadNextLevel();
+		currentLevel = startingLevel - 1;
+		mainMenu = transform.FindChild ("Canvas").Find ("Main Menu").gameObject;
+		
 	}
 
-	void OnLevelWasLoaded(int level)
+	void OnLevelWasLoaded (int level)
 	{
-		scoreKeepingScript = GameObject.Find("Scene").transform.Find("World").GetComponent<ScoreKeeping>();
-		transform.FindChild("Canvas").GetComponent<Canvas>().worldCamera = Camera.main;
-		addObstacles();
-		currentMaterial = dashedLines;
-		setMaterialType(currentMaterial);
-	}
-
-	void Update ()
-	{
-		if(scoreKeepingScript != null && scoreKeepingScript.getWin())
-		{
-			scoreKeepingScript.setWin(false);
-			currentLevel++;
-			loadNextLevel();
+		scoreKeepingScript = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
+		scoreKeepingScript.resetHitsForHole ();
+		transform.FindChild ("Canvas").GetComponent<Canvas> ().worldCamera = Camera.main;
+		mouseOverUI = false;
+		addObstacles ();
+		if (currentLevel <= 20) {
+			currentMaterial = coloredLevels;
+		} else {
+			currentMaterial = dashedLines;
 		}
+		setMaterialType (currentMaterial);
 	}
 
-	void loadNextLevel()
+	void loadCurrentLevel ()
 	{
-		removeAllObstacles();
-		if(levelOrder[currentLevel]<10)
-		{
-			Application.LoadLevel("Level0"+levelOrder[currentLevel]+"F");
-		}
-		else
-		{
-			Application.LoadLevel("Level"+levelOrder[currentLevel]+"F");
-		}
+		removeAllObstacles ();
+		if (levelOrder [currentLevel] < 10) {
+			Application.LoadLevel ("Level0" + levelOrder [currentLevel] + "F");
+		} else {
+			Application.LoadLevel ("Level" + levelOrder [currentLevel] + "F");
+		}	
+		
 	}
 
-	public void restartLevel()
+	public void restartLevel ()
 	{
-		loadNextLevel();
+		loadCurrentLevel ();
 	}
 
-	public void nextLevel()
+	public void nextLevel ()
 	{
 		currentLevel++;
-		loadNextLevel();
+		loadCurrentLevel ();
 	}
 
-	public void toggleMaterial()
+	public void toggleMaterial ()
 	{
-		if(currentMaterial == dashedLines)
-		{
+		if (currentMaterial == dashedLines) {
 			currentMaterial = coloredLevels;
-			setMaterialType(currentMaterial);
-		}
-		else
-		{
+		} else {
 			currentMaterial = dashedLines;
-			setMaterialType(currentMaterial);
 		}
+		setMaterialType (currentMaterial);
 	}
-
-	private void addObstacles()
+	
+	public void MouseIsOverUI ()
 	{
-		obstacles = GameObject.FindGameObjectsWithTag("Obstacle");
+		mouseOverUI = true;
+	}
+	
+	public void MouseIsNotOverUI ()
+	{
+		mouseOverUI = false;
+	}
+	
+	public bool GetMouseOverUI ()
+	{
+		return mouseOverUI;
+	}
+	
+	public void StartingLevel (int level)
+	{
+		currentLevel = level - 1;
+		loadCurrentLevel ();
+		Destroy (mainMenu);		
 	}
 
-	private void removeAllObstacles()
+	private void addObstacles ()
+	{
+		obstacles = GameObject.FindGameObjectsWithTag ("Obstacle");
+	}
+
+	private void removeAllObstacles ()
 	{
 		obstacles = null;
 	}
 
-	private void setMaterialType(Material mat)
+	private void setMaterialType (Material mat)
 	{
-		foreach(GameObject obstacle in obstacles)
-		{
-			obstacle.GetComponent<Renderer>().material = mat;
+		foreach (GameObject obstacle in obstacles) {
+			obstacle.GetComponent<Renderer> ().material = mat;
 		}
 	}
 }

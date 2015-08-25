@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class ScoreKeeping : MonoBehaviour {
+public class ScoreKeeping : MonoBehaviour
+{
 
 	public GameObject panel;
 	public Text textScore;
@@ -15,49 +16,47 @@ public class ScoreKeeping : MonoBehaviour {
 	private int sumPar;
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		won = false;
-		score = 11;
+		score = 0;
 		hits = 0;
 		parForHole = 3;
-		sumPar = 15;
-		DontDestroyOnLoad(this);
+		sumPar = 0;
+		DontDestroyOnLoad (this);
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		textScore.text = score+"/"+sumPar;
+	void Update ()
+	{
+		textScore.text = score + "/" + sumPar;
 		hitsOutOfPar.text = hits + "/" + parForHole;
 		if (won == true) {
-			panel.SetActive(true);
+			panel.SetActive (true);
 		} else {
-			panel.SetActive(false);
+			panel.SetActive (false);
 		}
 	}
 
-	public void addToHits()
+	public void addToHits ()
 	{
 		hits++;
 		score++;
 	}
+	
+	public void resetHitsForHole ()
+	{
+		hits = 0;
+		sumPar += 3;
+	}
 
-	public int getScore()
+	public int getScore ()
 	{
 		return score;
 	}
 
-	public int getHits()
+	public int getHits ()
 	{
 		return hits;
-	}
-
-	public void setWin(bool win)
-	{
-		won = win;
-	}
-
-	public bool getWin()
-	{
-		return won;
 	}
 }

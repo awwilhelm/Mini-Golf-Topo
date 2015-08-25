@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BallForce : MonoBehaviour {
+public class BallForce : MonoBehaviour
+{
 
 	//Gets component reference
 	public ScoreKeeping scoreKeepingScript;
@@ -13,7 +14,7 @@ public class BallForce : MonoBehaviour {
 	private bool isBallMoving;
 	private bool inHole;
 	private bool addForceBool;
-	private float lastTimeBallStopped=0;
+	private float lastTimeBallStopped = 0;
 	private bool stopBuffer = false;
 
 	//After ball is done moving after hit, mini map should exit full screen
@@ -25,87 +26,85 @@ public class BallForce : MonoBehaviour {
 
 	private int inBoundsCount;
 	private Vector3 lastPosition;
+	private bool ballLock;
+	private LevelManager levelManagerScript;
 
 	//Constant variables
 	private const float DELAY_BEFORE_BALL_HIT = 0.25f;
 	private const float MIN_BALL_VELOCITY = 0.5f;
-	private const float STOP_BUFFER_TIME = 0.25f;
+	private const float STOP_BUFFER_TIME = 0.1f;
 
-	void Start () {
+	void Start ()
+	{
 		ballRigidbody = GetComponent<Rigidbody> ();
+		scoreKeepingScript = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
+		levelManagerScript = GameObject.Find ("LevelManager").GetComponent<LevelManager> ();
 		ballRigidbody.maxAngularVelocity = 20;
 
 		hitForce = 0;
 		isBallMoving = false;
-		inHole =  false;
+		inHole = false;
 		addForceBool = false;
 
 		animationAfterHit = false;
 		fullScreenOnHit = true;
 
 		hasBallBeenHitForStroke = false;
+		ballLock = true;
 
 		inBoundsCount = 0;
 		lastPosition = transform.position;
 	}
 	
-	void Update()
-	{
+	void Update ()
+	{	
 		//If the player has clicked, wants to add force, and is in full screen. Adds force.
-		if(addForceBool && (cameraFollow.getFullScreen() || !animationAfterHit))
-		{
+		if (addForceBool && (cameraFollow.getFullScreen () || !animationAfterHit)) {
 			addForceBool = false;
-			StartCoroutine(addForce(hitForce));
+			StartCoroutine (addForce (hitForce));
 
 		}
 
 		//The balls velocity has to be stopped for a certain time and if it is, the ball will finally be considered stopped.
-		if(Time.time - lastTimeBallStopped > STOP_BUFFER_TIME && stopBuffer)
-		{
+		if (Time.time - lastTimeBallStopped > STOP_BUFFER_TIME && stopBuffer) {
 			//WINNER
-			if(inHole)
-			{
-				scoreKeepingScript.setWin(true);
-			}
-			else if(cameraFollow.getFullScreen() && hasBallBeenHitForStroke)
-			{
-				stopBall();
-				if(inBoundsCount <= 0)
-				{
+			if (inHole) {
+				levelManagerScript.nextLevel ();
+			} else if (cameraFollow.getFullScreen () && hasBallBeenHitForStroke) {
+				stopBall ();
+				if (inBoundsCount <= 0) {
 					transform.position = lastPosition;
-				}
-				else
-				{
+				} else {
 					lastPosition = transform.position;
 				}
 			}
-		}
-		else if(!stopBuffer)
-		{
+		} else if (!stopBuffer) {
 			//Sets the timer for how long the ball needs to be stopped
 			lastTimeBallStopped = Time.time;
 			stopBuffer = true;
 		}
 
 		//Tests if the velocity is close to being stopped
-		if((Mathf.Abs (ballRigidbody.velocity.x) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.y) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.z) < MIN_BALL_VELOCITY))
-		{
+		if ((Mathf.Abs (ballRigidbody.velocity.x) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.y) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.z) < MIN_BALL_VELOCITY)) {
 			isBallMoving = false;
-		}
-		else if(hasBallBeenHitForStroke == true)
-		{
+		} else if (hasBallBeenHitForStroke == true) {
 			isBallMoving = true;
 			stopBuffer = false;
+		}
+		
+		if (ballLock) {
+			stopBall ();
 		}
 	}
 
 	//Add a force to the ball and adds the hit to scorekeeping.
-	public IEnumerator addForce(float force)
+	public IEnumerator addForce (float force)
 	{
+		ballLock = false;
 		Vector3 forward = new Vector3 (transform.forward.x, 0, transform.forward.z);
 
-		if(animationAfterHit || fullScreenOnHit)
-			yield return new WaitForSeconds(DELAY_BEFORE_BALL_HIT);
+		if (animationAfterHit || fullScreenOnHit)
+			yield return new WaitForSeconds (DELAY_BEFORE_BALL_HIT);
 
 		ballRigidbody.AddForce (forward * force, ForceMode.Acceleration);
 
@@ -114,58 +113,53 @@ public class BallForce : MonoBehaviour {
 	}
 
 	//Checks if the ball entered the hole
-	public void OnTriggerEnter(Collider collided){
-		if(collided.transform.tag == "Hole" )
-		{
+	public void OnTriggerEnter (Collider collided)
+	{
+		if (collided.transform.tag == "Hole") {
 			inHole = true;
-		}
-		else if(collided.transform.tag == "InBounds")
-		{
+		} else if (collided.transform.tag == "InBounds") {
 			inBoundsCount++;
 		}
 	}
 
 	//Checks if the ball leaves the hole
-	public void OnTriggerExit(Collider collided){
-		if(collided.transform.tag == "Hole" )
-		{
+	public void OnTriggerExit (Collider collided)
+	{
+		if (collided.transform.tag == "Hole") {
 			inHole = false;
-		}
-		else if(collided.transform.tag == "InBounds")
-		{
+		} else if (collided.transform.tag == "InBounds") {
 			inBoundsCount--;
-		}
-		else if(collided.transform.tag == "OutOfBounds")
-		{
-			stopBall();
+		} else if (collided.transform.tag == "OutOfBounds") {
+			stopBall ();
 			transform.position = lastPosition;
 		}
 	}
 
 	//Getter to see if the ball is currently moving
-	public bool getBallMoving()
+	public bool getBallMoving ()
 	{
 		return isBallMoving;
 	}
 
 	//Allows the animation to fully play through before hitting the ball
-	public void addHitForce(float force)
+	public void addHitForce (float force)
 	{
 		hitForce = force;
 		addForceBool = true;
 
-		if(animationAfterHit)
-			cameraFollow.initiateFullScreenAnimation();
-		else if(fullScreenOnHit)
-			cameraFollow.makeFullScreen();
+		if (animationAfterHit)
+			cameraFollow.initiateFullScreenAnimation ();
+		else if (fullScreenOnHit)
+			cameraFollow.makeFullScreen ();
 
 	}
 
-	private void stopBall()
+	private void stopBall ()
 	{
 		ballRigidbody.velocity = Vector3.zero;
 		ballRigidbody.angularVelocity = Vector3.zero;
-		cameraFollow.exitFullScreen();
+		cameraFollow.exitFullScreen ();
 		hasBallBeenHitForStroke = false;
+		ballLock = true;
 	}
 }
