@@ -12,7 +12,7 @@ public class ControlBall : MonoBehaviour
 	public GameObject camera3D;
 	public Material arrowTailShader;
 	private ScoreKeeping scoreKeepingScript;	
-	private BallForce bfScript;
+	private BallManager bfScript;
 	private CameraFollow cameraFollowScript;
 	private CanvasRenderer arrowTailRenderer;
 	private GameObject levelManage;
@@ -41,7 +41,7 @@ public class ControlBall : MonoBehaviour
 		arrowHead.sizeDelta = new Vector2 (arrowHead.rect.width * ARROW_HEAD_SCALE_COEFFICIENT, arrowHead.rect.height * ARROW_HEAD_SCALE_COEFFICIENT);
 		arrowTail.sizeDelta = new Vector2 (arrowTail.rect.width, arrowTail.rect.height * ARROW_TAIL_SCALE_COEFFICIENT);
 		scoreKeepingScript = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
-		bfScript = GetComponent<BallForce> ();
+		bfScript = GetComponent<BallManager> ();
 		cameraFollowScript = camera3D.GetComponent<CameraFollow> ();
 		levelManage = GameObject.Find ("LevelManager");
 		levelManagerScript = levelManage == null ? null : levelManage.GetComponent<LevelManager> ();
@@ -67,7 +67,7 @@ public class ControlBall : MonoBehaviour
 
 				forceCurve = 2750 * force + 300;
 
-				bfScript.addHitForce (forceCurve);
+				bfScript.startCameraAnimationAndForce (forceCurve);
 			}
 		}
 		//If the player does not left click then this updates the dirction the ball faces and the arrow.

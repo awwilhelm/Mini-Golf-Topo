@@ -16,8 +16,8 @@ public class TopDownCameraFollow : MonoBehaviour
 	{
 		hole = GameObject.Find ("Hole");
 		thisCamera = GetComponent<Camera> ();
-		xBuffer = 25;
-		zBuffer = 25;
+		xBuffer = Screen.height / 18; //Max is 750
+		zBuffer = Screen.width / 35;  //Max is 1400
 	}
 	
 	// Update is called once per frame
@@ -33,10 +33,19 @@ public class TopDownCameraFollow : MonoBehaviour
 		float cameraHeight = thisCamera.ScreenToWorldPoint (new Vector3 (0, thisCamera.pixelHeight, thisCamera.nearClipPlane)).x - thisCamera.ScreenToWorldPoint (new Vector3 (0, 0, thisCamera.nearClipPlane)).x;
 		float cameraWidth = thisCamera.ScreenToWorldPoint (new Vector3 (0, 0, thisCamera.nearClipPlane)).z - thisCamera.ScreenToWorldPoint (new Vector3 (thisCamera.pixelWidth, 0, thisCamera.nearClipPlane)).z;
 
-		if (cameraXPos + (cameraHeight / 2) < ball.transform.position.x + xBuffer)
-			cameraXPos += ball.transform.position.x + xBuffer - (cameraXPos + (cameraHeight / 2));
-		if (cameraZPos + (cameraWidth / 2) < ball.transform.position.z + zBuffer)
-			cameraZPos += ball.transform.position.z + zBuffer - (cameraZPos + (cameraWidth / 2));
+		//Left and right or the width is the z coordinate and up and down or height is the x coordinate
+		//(0,0) is at the CENTER and gets bigger in top left
+		if (cameraXPos + (cameraHeight / 2) < ball.transform.position.x + xBuffer) {
+			cameraXPos = ball.transform.position.x + xBuffer - (cameraHeight / 2);
+		} else if (cameraXPos - (cameraHeight / 2) > ball.transform.position.x - xBuffer) {
+			cameraXPos = ball.transform.position.x - xBuffer + (cameraHeight / 2);
+		}
+		
+		if (cameraZPos + (cameraWidth / 2) < ball.transform.position.z + zBuffer) {
+			cameraZPos = ball.transform.position.z + zBuffer - (cameraWidth / 2);
+		} else if (cameraZPos - (cameraWidth / 2) > ball.transform.position.z - zBuffer) {
+			cameraZPos = ball.transform.position.z - zBuffer + (cameraWidth / 2);
+		}
 
 		return new Vector3 (cameraXPos, 200, cameraZPos);
 	}

@@ -23,10 +23,10 @@ public class LevelManager : MonoBehaviour
 
 		//Change the numbers to customize the order of the levels
 		levelOrder = new int[32] {
+			4,
 			1,
 			2,
 			3,
-			4,
 			5,
 			6,
 			7,
