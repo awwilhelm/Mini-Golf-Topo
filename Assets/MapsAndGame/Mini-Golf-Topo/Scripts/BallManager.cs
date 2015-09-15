@@ -37,7 +37,8 @@ public class BallManager : MonoBehaviour
 	
 	void Start ()
 	{
-		
+		animationAfterHit = false;
+		fullScreenOnHit = false;
 		levelManagerScript = GameObject.Find ("LevelManager").GetComponent<LevelManager> ();
 		ballRigidbody = GetComponent<Rigidbody> ();
 		ballRigidbody.maxAngularVelocity = 20;
@@ -93,6 +94,7 @@ public class BallManager : MonoBehaviour
 		//Tests if the velocity is close to being stopped
 		if ((Mathf.Abs (ballRigidbody.velocity.x) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.y) < MIN_BALL_VELOCITY) && (Mathf.Abs (ballRigidbody.velocity.z) < MIN_BALL_VELOCITY)) {
 			isBallMoving = false;
+			ballRigidbody.velocity = Vector3.zero;
 		} else if (hasBallBeenHitForStroke == true) {
 			isBallMoving = true;
 			stopBuffer = false;
@@ -157,6 +159,11 @@ public class BallManager : MonoBehaviour
 	public bool getBallMoving ()
 	{
 		return isBallMoving;
+	}
+	
+	public bool GetWin ()
+	{
+		return inHole;
 	}
 	
 	private void stopBallAndExitFullScreen (bool exitFullScreen)

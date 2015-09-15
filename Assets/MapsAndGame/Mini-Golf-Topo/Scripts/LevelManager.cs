@@ -3,13 +3,13 @@ using System.Collections;
 
 public class LevelManager : MonoBehaviour
 {
-
 	private ScoreKeeping scoreKeepingScript;
 
 	//startingLevel is the index of levelOrder
 	public int startingLevel;
 	public Material coloredLevels;
 	public Material dashedLines;
+	public GameObject devControlCanvas;
 	private Material currentMaterial;
 	private int currentLevel;
 	private int[] levelOrder;
@@ -69,6 +69,12 @@ public class LevelManager : MonoBehaviour
 	{
 		scoreKeepingScript = GameObject.Find ("World").GetComponent<ScoreKeeping> ();
 		scoreKeepingScript.resetHitsForHole ();
+		if (Application.loadedLevelName.Equals ("StartF")) {
+			devControlCanvas.gameObject.SetActive (false);
+		} else {
+			devControlCanvas.gameObject.SetActive (true);
+		}
+		
 		transform.FindChild ("Canvas").GetComponent<Canvas> ().worldCamera = Camera.main;
 		mouseOverUI = false;
 		addObstacles ();
@@ -83,17 +89,31 @@ public class LevelManager : MonoBehaviour
 	void loadCurrentLevel ()
 	{
 		removeAllObstacles ();
-		if (levelOrder [currentLevel] < 10) {
-			Application.LoadLevel ("Level0" + levelOrder [currentLevel] + "F");
+		if (currentLevel > levelOrder.Length - 1) {
+			Application.LoadLevel ("EndF");
 		} else {
-			Application.LoadLevel ("Level" + levelOrder [currentLevel] + "F");
-		}	
+			if (levelOrder [currentLevel] < 10) {
+				Application.LoadLevel ("Level0" + levelOrder [currentLevel] + "F");
+			} else {
+				Application.LoadLevel ("Level" + levelOrder [currentLevel] + "F");
+			}	
+		}
 		
 	}
 
 	public void restartLevel ()
 	{
 		loadCurrentLevel ();
+	}
+	
+	public void returnToMainMenu ()
+	{
+		GameObject[] roots = GameObject.FindGameObjectsWithTag ("Root") as GameObject[];
+		
+		foreach (GameObject root in roots) {
+			Destroy (root);
+		}
+		Application.LoadLevel ("StartF");
 	}
 
 	public void nextLevel ()
