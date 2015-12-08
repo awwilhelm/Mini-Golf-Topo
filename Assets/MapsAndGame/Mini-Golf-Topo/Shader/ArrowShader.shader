@@ -21,6 +21,7 @@
 	    CGPROGRAM
     	#pragma vertex vert
 	    #pragma surface surf Lambert
+		#pragma target 3.0
 
         sampler2D _MainTex;
         float _TexWidth;
